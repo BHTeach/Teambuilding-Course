@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategic Teambuilding Course | British Hills</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Inter"', 'sans-serif'],
+                    },
+                    colors: {
+                        bh: {
+                            navy: '#0e1526',     /* Deep pamphlet background navy */
+                            orange: '#f97316',   /* New strategic orange accent */
+                            light: '#f8fafc',    /* Soft off-white background */
+                            text: '#2d3748',     /* Dark text for readability */
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Language Switching & Interaction CSS -->
+    <style>
+        body.lang-en .ja { display: none !important; }
+        body.lang-ja .en { display: none !important; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            border-color: #f97316;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Modal Overlay Styles */
+        #image-viewer-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background-color: rgba(14, 21, 38, 0.95);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body class="lang-en min-h-screen bg-bh-light font-sans text-bh-text selection:bg-bh-orange selection:text-white">
+
+    <!-- Image Viewer Modal -->
+    <div id="image-viewer-modal" class="flex flex-col">
+        <div class="relative w-full max-w-5xl bg-white p-2 rounded shadow-2xl overflow-hidden">
+            <!-- Close/Back Button -->
+            <button onclick="closeViewer()" class="absolute top-4 right-4 z-10 bg-bh-navy text-white px-4 py-2 rounded-full font-bold text-xs hover:bg-bh-orange transition-colors">
+                <span class="en">GO BACK</span>
+                <span class="ja">戻る</span>
+            </button>
+            
+            <!-- Image Container -->
+            <div class="w-full flex justify-center items-center bg-gray-100 min-h-[300px] md:min-h-[500px]">
+                <img id="viewer-img" src="" alt="Lesson Detail" class="max-w-full max-h-[80vh] object-contain">
+            </div>
+
+            <!-- Footer Navigation -->
+            <div class="flex justify-between items-center p-4 bg-white border-t">
+                <div class="text-xs font-black text-bh-navy uppercase tracking-widest" id="viewer-label">
+                    <!-- Lesson Title Here -->
+                </div>
+                <div id="viewer-controls" class="flex gap-4">
+                    <button onclick="nextImage()" id="next-btn" class="bg-bh-orange text-white px-8 py-2 rounded font-black text-sm hover:bg-bh-navy transition-all flex items-center gap-2">
+                        <span class="en">NEXT</span>
+                        <span class="ja">次へ</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <!-- British Hills Logo -->
+                <div class="flex items-center gap-3">
+                    <img src="assets/logo.png" alt="British Hills Logo" class="h-10 w-auto" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                    <div style="display:none" class="w-8 h-8 bg-bh-navy rounded items-center justify-center text-white font-bold text-xs">BH</div>
+                    <span class="font-extrabold text-bh-navy tracking-tight text-lg uppercase">British Hills</span>
+                </div>
+            </div>
+            
+            <!-- Language Toggle -->
+            <div class="flex bg-gray-100 rounded-full p-1 border border-gray-200">
+                <button onclick="setLanguage('en')" id="btn-en" class="px-5 py-1.5 text-sm font-semibold transition-colors duration-200 bg-white text-bh-navy rounded-full shadow-sm">
+                    English
+                </button>
+                <button onclick="setLanguage('ja')" id="btn-ja" class="px-5 py-1.5 text-sm font-semibold transition-colors duration-200 text-gray-500 hover:text-bh-navy rounded-full">
+                    日本語
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-bh-navy text-white pt-24 pb-20">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="animate-fade-in">
+                <p class="text-bh-orange font-bold tracking-widest text-sm uppercase mb-6">
+                    <span class="en">Teambuilding, Collaboration and Communication</span>
+                    <span class="ja">チームビルディング、コラボレーション、コミュニケーション</span>
+                </p>
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-2 leading-tight text-white uppercase">
+                    <span class="en">The Strategic</span>
+                    <span class="ja">戦略的</span>
+                </h1>
+                <h2 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-8 leading-tight text-bh-orange uppercase">
+                    <span class="en">Teambuilding Course</span>
+                    <span class="ja">チームビルディング・コース</span>
+                </h2>
+                <p class="text-lg sm:text-xl text-gray-200 max-w-3xl mx-auto font-medium leading-snug">
+                    <span class="en">Improve communication and collaboration strategies among your team through high-pressure, engaging challenges.</span>
+                    <span class="ja">プレッシャーのかかる魅力的な課題を通じて、チーム内におけるコミュニケーションとコラボレーションの戦略を改善・強化します。</span>
+                </p>
+
+                <div class="mt-10 flex justify-center">
+                    <div class="inline-block bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-2 rounded text-xs font-bold uppercase tracking-widest">
+                        <span class="en">Capacity: 4-20 Participants</span>
+                        <span class="ja">定員：4名〜20名規模</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Value Proposition -->
+    <section class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h3 class="text-bh-orange font-bold uppercase tracking-widest text-sm mb-4">
+                        <span class="en">Why This Course?</span>
+                        <span class="ja">なぜこのコースなのか？</span>
+                    </h3>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-bh-navy mb-8 leading-tight">
+                        <span class="en">Go Beyond the Individual.<br>Strengthen the Team.</span>
+                        <span class="ja">個人の枠を超え、<br>チームの結束を強める。</span>
+                    </h2>
+                    <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                        <span class="en">Conventional English training often fails to replicate the pressure of real business. Our course uses the "Escape Room" framework to elicit genuine communication strategies, forcing teams to negotiate, clarify errors, and cooperate under strict time constraints.</span>
+                        <span class="ja">従来の英語研修では、実際のビジネス現場でかかる「プレッシャー」を再現することは困難でした。本コースでは「脱出ゲーム」の枠組みを活用し、限られた時間の中で交渉、ミスの修正、部門間連携を強制的に発生させ、真のコミュニケーション戦略を引き出します。</span>
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4 font-bold text-bh-navy">
+                            <div class="w-6 h-6 rounded-full bg-bh-orange/20 flex items-center justify-center text-bh-orange text-xs">✓</div>
+                            <span class="en">Dynamic Team Building</span><span class="ja">ダイナミックなチームビルディング</span>
+                        </div>
+                        <div class="flex items-center gap-4 font-bold text-bh-navy">
+                            <div class="w-6 h-6 rounded-full bg-bh-orange/20 flex items-center justify-center text-bh-orange text-xs">✓</div>
+                            <span class="en">Real-world Problem Solving</span><span class="ja">実践的な問題解決能力</span>
+                        </div>
+                        <div class="flex items-center gap-4 font-bold text-bh-navy">
+                            <div class="w-6 h-6 rounded-full bg-bh-orange/20 flex items-center justify-center text-bh-orange text-xs">✓</div>
+                            <span class="en">Professional Reflection (Debrief)</span><span class="ja">プロフェッショナルな振り返り（デブリーフィング）</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Immersive Image Box -->
+                <div class="bg-bh-light border-2 border-bh-navy shadow-[8px_8px_0px_#0e1526] overflow-hidden">
+                    <img src="assets/manor-house.jpg" alt="British Hills Manor House" class="w-full h-64 object-cover border-b-2 border-bh-navy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+                    <div class="text-center py-8">
+                        <h4 class="text-xl font-bold text-bh-navy uppercase mb-2">Immersive Environment</h4>
+                        <p class="text-gray-500 font-medium">British Hills, Fukushima</p>
+                        <div class="w-16 h-1 bg-bh-orange mx-auto mt-6"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The Three Scenarios -->
+    <section class="py-20 bg-bh-light border-y border-gray-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-12 text-center flex flex-col items-center">
+                <h2 class="text-2xl font-bold text-bh-navy uppercase tracking-wider mb-4">
+                    <span class="en">The Training Arc</span>
+                    <span class="ja">研修カリキュラム</span>
+                </h2>
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Click any lesson to see details</p>
+                <div class="w-24 h-1 bg-bh-orange"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
+                <!-- Lesson 1 -->
+                <div onclick="openViewer(1)" class="bg-white p-8 border border-gray-200 shadow-sm flex flex-col card-hover">
+                    <div class="text-bh-orange font-black text-xs mb-4 uppercase tracking-widest">Level 01 // Crisis</div>
+                    <h3 class="text-xl font-bold text-bh-navy mb-4 uppercase">
+                        <span class="en">Storm Protocol</span>
+                        <span class="ja">ストーム・プロトコル</span>
+                    </h3>
+                    <p class="text-gray-600 text-sm leading-relaxed flex-grow">
+                        <span class="en">The Manor House power has failed, and only by working together can departments bring it back on in time. Teams must decode, recreate and share fragmented data, break down information silos and establish clear communication channels.</span>
+                        <span class="ja">マナーハウスで停電が発生。制限時間内に電力を復旧させるには、全部署の協力が不可欠です。断片化されたデータの解読・再現・共有を行い、組織の壁（セクショナリズム）を打破し、明確な通信網を確立しなければなりません。</span>
+                    </p>
+                </div>
+
+                <!-- Lesson 2 -->
+                <div onclick="openViewer(2)" class="bg-white p-8 border border-gray-200 shadow-sm flex flex-col card-hover">
+                    <div class="text-bh-orange font-black text-xs mb-4 uppercase tracking-widest">Level 02 // Trust</div>
+                    <h3 class="text-xl font-bold text-bh-navy mb-4 uppercase">
+                        <span class="en">Operation Midnight</span>
+                        <span class="ja">オペレーション・ミッドナイト</span>
+                    </h3>
+                    <p class="text-gray-600 text-sm leading-relaxed flex-grow">
+                        <span class="en">A corporate espionage simulation, with each department taking charge of a different aspect of a heist. Teams work together to breach security walls while maintaining a balance between trust, speed, and verification.</span>
+                        <span class="ja">企業スパイのシミュレーション。各部署が強奪作戦の異なる役割を担当します。セキュリティの壁を突破するため、信頼・スピード・検証のバランスを保ちながら連携します。</span>
+                    </p>
+                </div>
+
+                <!-- Lesson 3 -->
+                <div onclick="openViewer(3)" class="bg-white p-8 border border-gray-200 shadow-sm flex flex-col card-hover">
+                    <div class="text-bh-orange font-black text-xs mb-4 uppercase tracking-widest">Level 03 // Agility</div>
+                    <h3 class="text-xl font-bold text-bh-navy mb-4 uppercase">
+                        <span class="en">Project AEGIS</span>
+                        <span class="ja">プロジェクト・イージス</span>
+                    </h3>
+                    <p class="text-gray-600 text-sm leading-relaxed flex-grow">
+                        <span class="en">Defeat a rogue AI. Departments must maintain discipline, rebuild encrypted data and handle information overload, all while dealing with bottleneck issues necessitating communication discipline and high-speed change management.</span>
+                        <span class="ja">暴走したAIを停止せよ。情報過多やボトルネックといった課題に直面する中、規律を維持して暗号データを再構築します。徹底した通信規律と迅速なチェンジマネジメントが要求されます。</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Global Skills Focus (Stylised) -->
+            <div class="max-w-5xl mx-auto py-12 border-t border-bh-navy/10">
+                <div class="text-center mb-8">
+                    <span class="bg-bh-navy text-white text-[10px] font-black uppercase tracking-[0.4em] px-4 py-1.5 rounded-sm">
+                        <span class="en">Strategic Skills Matrix</span>
+                        <span class="ja">戦略的スキル・マトリックス</span>
+                    </span>
+                </div>
+                <div class="text-center px-4 max-w-4xl mx-auto">
+                    <p class="text-xs sm:text-sm font-bold text-bh-navy leading-loose tracking-wide en">
+                        Intradepartmental and Interdepartmental Cooperation
+                        <span class="text-bh-orange font-black px-1">//</span> Information Gathering
+                        <span class="text-bh-orange font-black px-1">//</span> Assigning Key Roles
+                        <span class="text-bh-orange font-black px-1">//</span> Merits and Demerits of Different Leadership Styles
+                        <span class="text-bh-orange font-black px-1">//</span> Understanding Different Working Styles
+                        <span class="text-bh-orange font-black px-1">//</span> Overcoming Information Silos
+                        <span class="text-bh-orange font-black px-1">//</span> Trust and Verification
+                        <span class="text-bh-orange font-black px-1">//</span> Change Management
+                        <span class="text-bh-orange font-black px-1">//</span> Handling Information Overload
+                        <span class="text-bh-orange font-black px-1">//</span> Overcoming Bottlenecks
+                    </p>
+                    <p class="text-[10px] sm:text-xs font-bold text-bh-navy/70 leading-loose tracking-wide ja mt-4">
+                        部署内および部署間の連携
+                        <span class="text-bh-orange font-black px-1">//</span> 情報収集
+                        <span class="text-bh-orange font-black px-1">//</span> 役割分担
+                        <span class="text-bh-orange font-black px-1">//</span> リーダーシップ・スタイルの利点と欠点
+                        <span class="text-bh-orange font-black px-1">//</span> 多様なワークスタイルの理解
+                        <span class="text-bh-orange font-black px-1">//</span> セクショナリズムの打破
+                        <span class="text-bh-orange font-black px-1">//</span> 信頼と検証
+                        <span class="text-bh-orange font-black px-1">//</span> チェンジマネジメント
+                        <span class="text-bh-orange font-black px-1">//</span> 情報過多への対処
+                        <span class="text-bh-orange font-black px-1">//</span> ボトルネックの克服
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reflection Phase -->
+    <section class="py-20 bg-bh-navy text-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h3 class="text-bh-orange font-bold uppercase tracking-widest text-sm mb-4">
+                    <span class="en">Reflection</span>
+                    <span class="ja">振り返り</span>
+                </h3>
+                <h2 class="text-3xl sm:text-4xl font-bold mb-6 leading-tight uppercase">
+                    <span class="en">Reflection is where<br>the learning sticks.</span>
+                    <span class="ja">「振り返り」こそが、<br>学びを定着させる。</span>
+                </h2>
+            </div>
+            
+            <div class="space-y-8">
+                <!-- Org Analysis -->
+                <div class="bg-white/5 border border-white/10 p-8 rounded-sm text-sm">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-8 h-8 rounded-full border-2 border-bh-orange flex items-center justify-center font-bold text-bh-orange">1</div>
+                        <h4 class="text-lg font-bold uppercase">
+                            <span class="en">Organizational Analysis</span>
+                            <span class="ja">組織構造の分析</span>
+                        </h4>
+                    </div>
+                    <p class="text-gray-300 leading-relaxed font-medium">
+                        <span class="en">Analyse whether your team adopted a top-down or horizontal communication structure and why. What roles did each team member take? How effective were different strategies?</span>
+                        <span class="ja">チームがトップダウン型、あるいは水平型のどちらのコミュニケーション構造を採用したか、そしてその理由を分析します。各チームメンバーはどのような役割を担いましたか？また、それぞれの戦略はどの程度効果的でしたか？</span>
+                    </p>
+                </div>
+
+                <!-- Silo Identification -->
+                <div class="bg-white/5 border border-white/10 p-8 rounded-sm text-sm">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-8 h-8 rounded-full border-2 border-bh-orange flex items-center justify-center font-bold text-bh-orange">2</div>
+                        <h4 class="text-lg font-bold uppercase">
+                            <span class="en">Silo Identification</span>
+                            <span class="ja">セクショナリズムの特定</span>
+                        </h4>
+                    </div>
+                    <p class="text-gray-300 leading-relaxed font-medium">
+                        <span class="en">Identify the "friction points" where information was hoarded or lost between departments. Discuss strategies to overcome these, and test.</span>
+                        <span class="ja">情報の抱え込みや部門間での情報欠落が発生した「摩擦点」を特定します。これらを克服するための戦略を議論し、実践（テスト）します。</span>
+                    </p>
+                </div>
+
+                <!-- Strategy Evolution -->
+                <div class="bg-white/5 border border-white/10 p-8 rounded-sm text-sm">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-8 h-8 rounded-full border-2 border-bh-orange flex items-center justify-center font-bold text-bh-orange">3</div>
+                        <h4 class="text-lg font-bold uppercase">
+                            <span class="en">Strategy Evolution</span>
+                            <span class="ja">戦略の進化</span>
+                        </h4>
+                    </div>
+                    <p class="text-gray-300 leading-relaxed font-medium">
+                        <span class="en">Compare performance across all three lessons to visualize the evolution of your team's English communication skills.</span>
+                        <span class="ja">全3レッスンを通じたパフォーマンスを比較し、チームの英語コミュニケーション能力の進化を可視化します。</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final Call to Action -->
+    <section class="py-24 bg-white border-t border-gray-200">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-bh-navy mb-6 uppercase tracking-tight">
+                <span class="en">Ready to Challenge Your Team?</span>
+                <span class="ja">チームの限界に挑戦しませんか？</span>
+            </h2>
+            <p class="text-xl text-gray-500 mb-12 font-medium leading-relaxed">
+                <span class="en">Book your Strategic Teambuilding Course at British Hills and transform the way your team communicates.</span>
+                <span class="ja">ブリティッシュヒルズの戦略的チームビルディング・コースを予約して、チームのコミュニケーションのあり方に変革を。</span>
+            </p>
+            
+            <a href="https://www.british-hills.co.jp/edu/contact/" target="_blank" class="inline-flex items-center justify-center gap-3 bg-bh-orange text-white font-bold text-lg px-10 py-5 rounded-full hover:bg-bh-navy transition-all duration-300 shadow-lg group">
+                <span class="en">Inquire Now</span>
+                <span class="ja">お問い合わせ</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+            
+            <div class="mt-16 text-gray-400 text-xs font-bold uppercase tracking-[0.3em]">
+                British Hills, Fukushima, Japan
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-[#090e1a] py-12 text-center border-t border-white/5">
+    </footer>
+
+    <!-- Logic -->
+    <script>
+        // Data Store
+        const lessonData = {
+            1: {
+                title: "Lesson 1: Storm Protocol",
+                images: ["assets/lesson1a.PNG", "assets/lesson1b.PNG", "assets/lesson1c.PNG", "assets/lesson1d.PNG"]
+            },
+            2: {
+                title: "Lesson 2: Operation Midnight",
+                images: ["assets/lesson2a.PNG", "assets/lesson2b.PNG", "assets/lesson2c.PNG", "assets/lesson2d.PNG"]
+            },
+            3: {
+                title: "Lesson 3: Project AEGIS",
+                images: ["assets/lesson3a.PNG"]
+            }
+        };
+
+        let currentLesson = 1;
+        let currentImgIdx = 0;
+
+        // Language Logic
+        function setLanguage(lang) {
+            const body = document.body;
+            const btnEn = document.getElementById('btn-en');
+            const btnJa = document.getElementById('btn-ja');
+            
+            body.classList.remove('lang-en', 'lang-ja');
+            body.classList.add('lang-' + lang);
+
+            const activeClasses = "px-5 py-1.5 text-sm font-semibold transition-colors duration-200 bg-white text-bh-navy rounded-full shadow-sm";
+            const inactiveClasses = "px-5 py-1.5 text-sm font-semibold transition-colors duration-200 text-gray-500 hover:text-bh-navy rounded-full";
+
+            if (lang === 'en') {
+                btnEn.className = activeClasses;
+                btnJa.className = inactiveClasses;
+            } else {
+                btnJa.className = activeClasses;
+                btnEn.className = inactiveClasses;
+            }
+        }
+
+        // Viewer Logic
+        function openViewer(lessonNum) {
+            currentLesson = lessonNum;
+            currentImgIdx = 0;
+            updateViewerUI();
+            document.getElementById('image-viewer-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent scroll
+        }
+
+        function closeViewer() {
+            document.getElementById('image-viewer-modal').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore scroll
+        }
+
+        function nextImage() {
+            const total = lessonData[currentLesson].images.length;
+            currentImgIdx = (currentImgIdx + 1) % total;
+            updateViewerUI();
+        }
+
+        function updateViewerUI() {
+            const data = lessonData[currentLesson];
+            const imgEl = document.getElementById('viewer-img');
+            const labelEl = document.getElementById('viewer-label');
+            const nextBtn = document.getElementById('next-btn');
+
+            imgEl.src = data.images[currentImgIdx];
+            labelEl.textContent = `${data.title} (${currentImgIdx + 1}/${data.images.length})`;
+
+            // Hide Next button if only one image
+            if (data.images.length <= 1) {
+                nextBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'flex';
+            }
+        }
+
+        // Close on ESC key
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeViewer();
+        });
+    </script>
+</body>
+</html>
